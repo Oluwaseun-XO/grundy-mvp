@@ -12,8 +12,8 @@ export default function Home() {
             Welcome to <span className="text-blue-600">Grundy</span>
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Experience seamless ordering with multiple payment options. 
-            Shop online, pay your way, and get your items delivered fast.
+            Connecting open-air markets and grocery shops to customers with last-mile delivery. 
+            Shop fresh groceries, pay your way, and support local merchants.
           </p>
         </div>
 
@@ -25,8 +25,8 @@ export default function Home() {
               </div>
               <h2 className="text-2xl font-semibold mb-4">Customer App</h2>
               <p className="text-gray-600 mb-6">
-                Browse our catalog, add items to cart, and choose from three payment methods:
-                Online Checkout, Bank Transfer on Delivery, or Terminal on Delivery.
+                Shop fresh groceries from local open-air markets and grocery shops. 
+                Choose from three payment methods with automatic 10% platform fee split.
               </p>
               <Link href="/customer">
                 <Button size="lg" className="w-full">

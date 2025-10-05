@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/Card';
 import { useCart } from '@/contexts/CartContext';
 import { PaymentMethod, Customer } from '@/types';
 import { formatCurrency } from '@/utils/paystack';
+import { calculateSplit } from '@/utils/paystack-split';
 
 interface CheckoutModalProps {
   isOpen: boolean;
@@ -196,6 +197,24 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               <div className="flex justify-between font-semibold">
                 <span>Total:</span>
                 <span className="text-blue-600">{formatCurrency(state.total)}</span>
+              </div>
+            </div>
+            
+            {/* Split Payment Breakdown */}
+            <div className="border-t pt-2 mt-2 text-xs text-gray-600">
+              <div className="mb-2">
+                <span className="font-medium">Payment Split:</span>
+              </div>
+              <div className="flex justify-between">
+                <span>• Merchants (90%):</span>
+                <span>{formatCurrency(calculateSplit(state.total).merchantAmount)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>• Grundy Platform Fee (10%):</span>
+                <span>{formatCurrency(calculateSplit(state.total).platformFee)}</span>
+              </div>
+              <div className="mt-1 text-xs text-gray-500">
+                Merchants: {[...new Set(state.items.map(item => item.product.merchant))].join(', ')}
               </div>
             </div>
           </div>

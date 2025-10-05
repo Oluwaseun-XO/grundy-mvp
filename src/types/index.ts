@@ -6,6 +6,8 @@ export interface Product {
   image: string;
   category: string;
   stock: number;
+  merchant: string;
+  available?: boolean;
 }
 
 export interface CartItem {
@@ -41,6 +43,10 @@ export interface Order {
   notes?: string;
   paystackReference?: string;
   virtualAccount?: VirtualAccount;
+  splitCode?: string;
+  platformFee?: number;
+  merchantAmount?: number;
+  merchants?: string[];
 }
 
 export interface VirtualAccount {

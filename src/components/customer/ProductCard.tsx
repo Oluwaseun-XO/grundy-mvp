@@ -58,11 +58,19 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </span>
         </div>
         
-        <div className="flex items-center justify-between">
-          <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-            {product.category}
-          </span>
-          
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+              {product.category}
+            </span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="text-xs text-gray-500">From:</span>
+            <span className="text-xs font-medium text-green-600">{product.merchant}</span>
+          </div>
+        </div>
+        
+        <div className="mt-3">
           <Button
             onClick={handleAddToCart}
             disabled={product.stock === 0}

@@ -1,12 +1,12 @@
-# Grundy MVP - Multi-Payment E-commerce Platform
+# Grundy MVP - Marketplace Platform
 
-A comprehensive food delivery MVP built with Next.js, Firebase, and Paystack integration featuring customer app, rider app, and multiple payment methods.
+A comprehensive marketplace MVP that connects open-air markets and grocery shops to customers, built with Next.js, Firebase, and Paystack integration featuring customer app, rider app, and multiple payment methods with automatic revenue splitting.
 
 ## 🚀 Features
 
 ### Customer App
-- **Product Catalog**: Browse 15+ hardcoded products with images, descriptions, and pricing
-- **Shopping Cart**: Add/remove items, adjust quantities, view total
+- **Product Catalog**: Browse 15+ grocery and market products from local merchants (Balogun Market, Alaba Grocery, Makoko Fish Market)
+- **Shopping Cart**: Add/remove items, adjust quantities, view total with automatic 10% platform fee calculation
 - **Multiple Payment Methods**:
   - **Online Checkout**: Instant payment with Paystack
   - **Bank Transfer on Delivery**: Virtual account generation via Paystack API
@@ -23,11 +23,13 @@ A comprehensive food delivery MVP built with Next.js, Firebase, and Paystack int
   - Confirm payment receipts
 - **Delivery Confirmation**: Update order status and payment confirmation
 
-### Payment Integration
+### Payment Integration & Revenue Model
 - **Paystack Integration**: Full test mode integration with public/secret keys
+- **Split Payments**: Automatic 10% platform fee split (90% to merchants, 10% to Grundy)
 - **Virtual Accounts**: Dynamic generation for bank transfer orders
 - **Transaction Tracking**: Complete audit trail for all payments
 - **Receipt System**: Automated receipt generation and email delivery
+- **Merchant Support**: Multi-merchant order handling with individual subaccounts
 
 ## 🛠 Tech Stack
 

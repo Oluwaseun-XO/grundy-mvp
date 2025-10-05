@@ -12,6 +12,7 @@ import { useCart } from '@/contexts/CartContext';
 import { PaymentMethod, Customer, Order } from '@/types';
 import { createOrder, createTransaction, createReceipt } from '@/utils/firebase';
 import { initializePaystackPayment, generateReference, createVirtualAccount } from '@/utils/paystack';
+import { calculateSplit } from '@/utils/paystack-split';
 import toast from 'react-hot-toast';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -36,6 +37,12 @@ export default function CustomerPage() {
       const orderId = uuidv4();
       const reference = generateReference();
 
+      // Calculate split payment details
+      const splitDetails = calculateSplit(state.total);
+      
+      // Get unique merchants from cart items
+      const merchants = [...new Set(state.items.map(item => item.product.merchant))];
+
       const orderData: Omit<Order, 'id' | 'createdAt' | 'updatedAt'> = {
         customer,
         items: state.items,
@@ -45,6 +52,9 @@ export default function CustomerPage() {
         orderStatus: 'pending',
         deliveryAddress: customer.address,
         paystackReference: reference,
+        platformFee: splitDetails.platformFee,
+        merchantAmount: splitDetails.merchantAmount,
+        merchants,
       };
 
       if (paymentMethod === 'online') {
