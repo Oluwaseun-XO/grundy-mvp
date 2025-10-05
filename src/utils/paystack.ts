@@ -9,14 +9,18 @@ export const initializePaystackPayment = (
   metadata?: Record<string, unknown>
 ) => {
   // @ts-expect-error PaystackPop is loaded from external script
-  const handler = PaystackPop.setup({
+ const handler = PaystackPop.setup({
     key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY,
     email,
     amount: amount * 100, // Paystack expects amount in kobo
     ref: reference,
     metadata: metadata || {},
-    onClose,
-    callback: onSuccess,
+    onClose: onClose,
+    callback: function(response: Record<string, unknown>) {
+      // This callback receives the response from Paystack
+      console.log('Paystack payment successful:', response);
+      onSuccess(response);
+    },
   });
   
   handler.openIframe();
