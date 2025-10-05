@@ -31,90 +31,94 @@ export default function CustomerPage() {
     return matchesSearch && matchesCategory;
   });
 
-  const handlePayment = async (paymentMethod: PaymentMethod, customer: Customer) => {
-    try {
-      const reference = generateReference();
+const handlePayment = async (paymentMethod: PaymentMethod, customer: Customer) => {
+  try {
+    const reference = generateReference();
 
-      // Calculate split payment details
-      const splitDetails = calculateSplit(state.total);
-      
-      // Get unique merchants from cart items
-      const merchants = [...new Set(state.items.map(item => item.product.merchant))];
+    // Calculate split payment details
+    const splitDetails = calculateSplit(state.total);
+    
+    // Get unique merchants from cart items
+    const merchants = [...new Set(state.items.map(item => item.product.merchant))];
 
-      const orderData: Omit<Order, 'id' | 'createdAt' | 'updatedAt'> = {
-        customer,
-        items: state.items,
-        total: state.total,
-        paymentMethod,
-        paymentStatus: paymentMethod === 'online' ? 'pending' : 'pending',
+    const orderData: Omit<Order, 'id' | 'createdAt' | 'updatedAt'> = {
+      customer,
+      items: state.items,
+      total: state.total,
+      paymentMethod,
+      paymentStatus: paymentMethod === 'online' ? 'pending' : 'pending',
+      orderStatus: 'pending',
+      deliveryAddress: customer.address,
+      paystackReference: reference,
+      platformFee: splitDetails.platformFee,
+      merchantAmount: splitDetails.merchantAmount,
+      merchants,
+    };
+
+    if (paymentMethod === 'online') {
+      // Create order first with pending status
+      const orderId = await createOrder({
+        ...orderData,
+        paymentStatus: 'pending',
         orderStatus: 'pending',
-        deliveryAddress: customer.address,
-        paystackReference: reference,
-        platformFee: splitDetails.platformFee,
-        merchantAmount: splitDetails.merchantAmount,
-        merchants,
-      };
+      });
 
-      if (paymentMethod === 'online') {
-        // Create order first with pending status
-        const orderId = await createOrder({
-          ...orderData,
-          paymentStatus: 'pending',
-          orderStatus: 'pending',
-        });
+      // Online payment with Paystack
+      initializePaystackPayment(
+        customer.email,
+        state.total,
+        reference,
+        async (response: Record<string, unknown>) => {
+          try {
+            // Update order status to paid
+            await updateOrderPaymentStatus(orderId, 'paid', 'confirmed');
 
-        // Online payment with Paystack
-        initializePaystackPayment(
-          customer.email,
-          state.total,
-          reference,
-          async (response: Record<string, unknown>) => {
-            try {
-              // Update order status to paid
-              await updateOrderPaymentStatus(orderId, 'paid', 'confirmed');
+            // Create transaction record
+            await createTransaction({
+              orderId,
+              amount: state.total,
+              paymentMethod: 'online',
+              status: 'paid',
+              reference: (response.reference as string) || reference,
+              paystackData: response,
+            });
 
-              // Create transaction record
-              await createTransaction({
-                orderId,
-                amount: state.total,
-                paymentMethod: 'online',
-                status: 'paid',
-                reference: (response.reference as string) || reference,
-                paystackData: response,
-              });
+            // Create receipt
+            await createReceipt({
+              orderId,
+              customerEmail: customer.email,
+              items: state.items,
+              total: state.total,
+              paymentMethod: 'online',
+            });
 
-              // Create receipt
-              await createReceipt({
-                orderId,
-                customerEmail: customer.email,
-                items: state.items,
-                total: state.total,
-                paymentMethod: 'online',
-              });
-
-              toast.success('Payment successful! Order confirmed.');
-              clearCart();
-              setShowCheckout(false);
-            } catch (error) {
-              console.error('Error processing successful payment:', error);
-              toast.error('Payment successful but order processing failed. Please contact support.');
-            }
-          },
-          () => {
-            toast.error('Payment cancelled');
-          },
-          { orderId } // Pass order ID in metadata for webhook processing
-        );
-      } else if (paymentMethod === 'bank_transfer') {
-        // Create order first
-        const orderId = await createOrder(orderData);
-        
-        // Bank transfer - create virtual account
+            toast.success('Payment successful! Order confirmed.');
+            clearCart();
+            setShowCheckout(false);
+          } catch (error) {
+            console.error('Error processing successful payment:', error);
+            toast.error('Payment successful but order processing failed. Please contact support.');
+          }
+        },
+        () => {
+          toast.error('Payment cancelled');
+        },
+        { orderId } // Pass order ID in metadata for webhook processing
+      );
+    } else if (paymentMethod === 'bank_transfer') {
+      // Create order first
+      const orderId = await createOrder(orderData);
+      
+      // Bank transfer - create virtual account
+      try {
         const virtualAccount = await createVirtualAccount(orderId, customer.email, state.total);
         
         if (virtualAccount) {
           // Update order with virtual account details
           await updateOrderPaymentStatus(orderId, 'pending', 'pending');
+
+          // Store virtual account in the order
+          await updateOrder(orderId, { virtualAccount });
 
           // Create transaction record
           await createTransaction({
@@ -125,34 +129,49 @@ export default function CustomerPage() {
             reference,
           });
 
-          toast.success('Order placed! Virtual account details will be provided to the rider.');
+          toast.success(`Order placed! Transfer ₦${state.total.toLocaleString()} to account ${virtualAccount.accountNumber} (${virtualAccount.bankName})`);
           clearCart();
           setShowCheckout(false);
         } else {
           throw new Error('Failed to create virtual account');
         }
-      } else if (paymentMethod === 'terminal') {
-        // Terminal payment - just create order
-        const finalOrderId = await createOrder(orderData);
-
-        // Create transaction record
+      } catch (error) {
+        console.error('Virtual account error:', error);
+        toast.error('Could not create virtual account. Please try another payment method.');
+        // Still create the order but without virtual account
         await createTransaction({
-          orderId: finalOrderId,
+          orderId,
           amount: state.total,
-          paymentMethod: 'terminal',
+          paymentMethod: 'bank_transfer',
           status: 'pending',
           reference,
         });
-
-        toast.success('Order placed! Payment will be processed on delivery via POS terminal.');
+        toast.success('Order placed! Payment details will be provided by the rider.');
         clearCart();
         setShowCheckout(false);
       }
-    } catch (error) {
-      console.error('Payment error:', error);
-      toast.error('Failed to process order. Please try again.');
+    } else if (paymentMethod === 'terminal') {
+      // Terminal payment - just create order
+      const finalOrderId = await createOrder(orderData);
+
+      // Create transaction record
+      await createTransaction({
+        orderId: finalOrderId,
+        amount: state.total,
+        paymentMethod: 'terminal',
+        status: 'pending',
+        reference,
+      });
+
+      toast.success('Order placed! Payment will be processed on delivery via POS terminal.');
+      clearCart();
+      setShowCheckout(false);
     }
-  };
+  } catch (error) {
+    console.error('Payment error:', error);
+    toast.error('Failed to process order. Please try again.');
+  }
+};
 
   return (
     <div className="min-h-screen bg-gray-50">
