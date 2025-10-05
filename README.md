@@ -6,6 +6,7 @@ A comprehensive marketplace MVP that connects open-air markets and grocery shops
 
 - **[🛠 Local Development Setup](./SETUP.md)** - Complete guide for setting up the project locally
 - **[🚀 Deployment Guide](./DEPLOYMENT.md)** - Step-by-step Vercel deployment instructions
+- **[🔐 Paystack Integration](./PAYSTACK_SETUP.md)** - Webhook setup and payment configuration
 - **[💡 Live Demo](#)** - Coming soon after deployment
 
 ## 🚀 Features

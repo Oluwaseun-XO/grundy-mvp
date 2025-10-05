@@ -93,6 +93,25 @@ export const subscribeToOrders = (callback: (orders: Order[]) => void) => {
   });
 };
 
+export const updateOrderPaymentStatus = async (
+  orderId: string, 
+  paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded',
+  orderStatus: 'pending' | 'confirmed' | 'preparing' | 'out_for_delivery' | 'delivered' | 'cancelled'
+): Promise<void> => {
+  try {
+    const orderRef = doc(db, 'orders', orderId);
+    await updateDoc(orderRef, {
+      paymentStatus,
+      orderStatus,
+      updatedAt: Timestamp.now(),
+    });
+    console.log(`Order ${orderId} updated: payment=${paymentStatus}, status=${orderStatus}`);
+  } catch (error) {
+    console.error('Error updating order payment status:', error);
+    throw error;
+  }
+};
+
 export const createTransaction = async (transactionData: Omit<Transaction, 'id' | 'createdAt'>): Promise<string> => {
   try {
     const docRef = await addDoc(collection(db, 'transactions'), {

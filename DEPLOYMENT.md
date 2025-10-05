@@ -22,6 +22,7 @@ Before deploying, ensure you have:
 1. Log into your Paystack Dashboard
 2. Go to Settings > API Keys & Webhooks
 3. Copy your Test Public Key and Test Secret Key
+4. **Important**: After deployment, you'll need to set up webhooks (see [Paystack Setup Guide](./PAYSTACK_SETUP.md))
 
 ### 1.3 Create Environment Variables
 You'll need these environment variables for Vercel:
@@ -139,7 +140,25 @@ PAYSTACK_SECRET_KEY=sk_test_your_secret_key
    - PIN: `0000`
    - OTP: `123456`
 
-## 🔧 Step 4: Configure Custom Domain (Optional)
+## 🔗 Step 4: Configure Paystack Webhooks
+
+**Important**: For production reliability, set up webhooks after deployment.
+
+1. **Get Your Webhook URL**
+   ```
+   https://your-domain.vercel.app/api/paystack/webhook
+   ```
+
+2. **Configure in Paystack Dashboard**
+   - Go to Settings > API Keys & Webhooks
+   - Click "Add Webhook"
+   - Enter your webhook URL
+   - Select events: `charge.success`, `charge.failed`, `transfer.success`, `transfer.failed`
+
+3. **Detailed Setup Instructions**
+   - See [Paystack Setup Guide](./PAYSTACK_SETUP.md) for complete webhook configuration
+
+## 🔧 Step 5: Configure Custom Domain (Optional)
 
 1. **In Vercel Dashboard**
    - Go to your project

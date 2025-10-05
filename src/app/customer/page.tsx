@@ -10,7 +10,7 @@ import { CheckoutModal } from '@/components/customer/CheckoutModal';
 import { Button } from '@/components/ui/Button';
 import { useCart } from '@/contexts/CartContext';
 import { PaymentMethod, Customer, Order } from '@/types';
-import { createOrder, createTransaction, createReceipt } from '@/utils/firebase';
+import { createOrder, createTransaction, createReceipt, updateOrderPaymentStatus } from '@/utils/firebase';
 import { initializePaystackPayment, generateReference, createVirtualAccount } from '@/utils/paystack';
 import { calculateSplit } from '@/utils/paystack-split';
 import toast from 'react-hot-toast';
@@ -58,6 +58,13 @@ export default function CustomerPage() {
       };
 
       if (paymentMethod === 'online') {
+        // Create order first with pending status
+        const orderId = await createOrder({
+          ...orderData,
+          paymentStatus: 'pending',
+          orderStatus: 'pending',
+        });
+
         // Online payment with Paystack
         initializePaystackPayment(
           customer.email,
@@ -65,16 +72,12 @@ export default function CustomerPage() {
           reference,
           async (response: Record<string, unknown>) => {
             try {
-              // Create order with paid status
-              const finalOrderId = await createOrder({
-                ...orderData,
-                paymentStatus: 'paid',
-                orderStatus: 'confirmed',
-              });
+              // Update order status to paid
+              await updateOrderPaymentStatus(orderId, 'paid', 'confirmed');
 
               // Create transaction record
               await createTransaction({
-                orderId: finalOrderId,
+                orderId,
                 amount: state.total,
                 paymentMethod: 'online',
                 status: 'paid',
@@ -84,7 +87,7 @@ export default function CustomerPage() {
 
               // Create receipt
               await createReceipt({
-                orderId: finalOrderId,
+                orderId,
                 customerEmail: customer.email,
                 items: state.items,
                 total: state.total,
@@ -101,21 +104,23 @@ export default function CustomerPage() {
           },
           () => {
             toast.error('Payment cancelled');
-          }
+          },
+          { orderId } // Pass order ID in metadata for webhook processing
         );
       } else if (paymentMethod === 'bank_transfer') {
+        // Create order first
+        const orderId = await createOrder(orderData);
+        
         // Bank transfer - create virtual account
         const virtualAccount = await createVirtualAccount(orderId, customer.email, state.total);
         
         if (virtualAccount) {
-          const finalOrderId = await createOrder({
-            ...orderData,
-            virtualAccount,
-          });
+          // Update order with virtual account details
+          await updateOrderPaymentStatus(orderId, 'pending', 'pending');
 
           // Create transaction record
           await createTransaction({
-            orderId: finalOrderId,
+            orderId,
             amount: state.total,
             paymentMethod: 'bank_transfer',
             status: 'pending',

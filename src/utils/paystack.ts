@@ -5,7 +5,8 @@ export const initializePaystackPayment = (
   amount: number,
   reference: string,
   onSuccess: (reference: Record<string, unknown>) => void,
-  onClose: () => void
+  onClose: () => void,
+  metadata?: Record<string, any>
 ) => {
   // @ts-expect-error PaystackPop is loaded from external script
   const handler = PaystackPop.setup({
@@ -13,6 +14,7 @@ export const initializePaystackPayment = (
     email,
     amount: amount * 100, // Paystack expects amount in kobo
     ref: reference,
+    metadata: metadata || {},
     onClose,
     callback: onSuccess,
   });
