@@ -2,6 +2,12 @@
 
 A comprehensive marketplace MVP that connects open-air markets and grocery shops to customers, built with Next.js, Firebase, and Paystack integration featuring customer app, rider app, and multiple payment methods with automatic revenue splitting.
 
+## 📚 Quick Links
+
+- **[🛠 Local Development Setup](./SETUP.md)** - Complete guide for setting up the project locally
+- **[🚀 Deployment Guide](./DEPLOYMENT.md)** - Step-by-step Vercel deployment instructions
+- **[💡 Live Demo](#)** - Coming soon after deployment
+
 ## 🚀 Features
 
 ### Customer App
