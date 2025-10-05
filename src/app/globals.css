@@ -24,3 +24,84 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Force text colors for better visibility */
+* {
+  color: inherit;
+}
+
+/* Ensure proper text contrast */
+.text-gray-900 {
+  color: #111827 !important;
+}
+
+.text-gray-800 {
+  color: #1f2937 !important;
+}
+
+.text-gray-700 {
+  color: #374151 !important;
+}
+
+.text-gray-600 {
+  color: #4b5563 !important;
+}
+
+.text-gray-500 {
+  color: #6b7280 !important;
+}
+
+.text-gray-400 {
+  color: #9ca3af !important;
+}
+
+/* Ensure inputs have proper text color */
+input, textarea, select {
+  color: #111827 !important;
+}
+
+/* Fix placeholder text */
+input::placeholder,
+textarea::placeholder {
+  color: #9ca3af !important;
+  opacity: 1;
+}
+
+/* Fix button text */
+button {
+  color: inherit;
+}
+
+/* Ensure proper contrast on white backgrounds */
+.bg-white * {
+  color: #111827;
+}
+
+.bg-gray-50 * {
+  color: #111827;
+}
+
+/* Fix specific color overrides */
+.text-blue-600 {
+  color: #2563eb !important;
+}
+
+.text-green-600 {
+  color: #16a34a !important;
+}
+
+.text-red-600 {
+  color: #dc2626 !important;
+}
+
+.text-purple-600 {
+  color: #9333ea !important;
+}
+
+.text-yellow-600 {
+  color: #ca8a04 !important;
+}
+
+.text-orange-600 {
+  color: #ea580c !important;
+}
