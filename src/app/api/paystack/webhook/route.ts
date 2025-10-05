@@ -73,26 +73,26 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function handleSuccessfulPayment(data: any) {
+async function handleSuccessfulPayment(data: Record<string, unknown>) {
   try {
-    const { reference, amount, customer, metadata } = data;
+    const { reference, amount, metadata } = data;
     
-    console.log(`Payment successful: ${reference} - ${amount/100}`);
+    console.log(`Payment successful: ${reference} - ${(amount as number)/100}`);
 
     // Extract order ID from reference or metadata
-    const orderId = metadata?.orderId || reference;
+    const orderId = (metadata as Record<string, unknown>)?.orderId || reference;
 
-    if (orderId) {
+    if (orderId && typeof orderId === 'string') {
       // Update order status
       await updateOrderPaymentStatus(orderId, 'paid', 'confirmed');
 
       // Create transaction record
       await createTransaction({
         orderId,
-        amount: amount / 100, // Convert from kobo to naira
+        amount: (amount as number) / 100, // Convert from kobo to naira
         paymentMethod: 'online',
         status: 'paid',
-        reference,
+        reference: reference as string,
         paystackData: data,
       });
 
@@ -103,15 +103,15 @@ async function handleSuccessfulPayment(data: any) {
   }
 }
 
-async function handleFailedPayment(data: any) {
+async function handleFailedPayment(data: Record<string, unknown>) {
   try {
     const { reference, metadata } = data;
     
     console.log(`Payment failed: ${reference}`);
 
-    const orderId = metadata?.orderId || reference;
+    const orderId = (metadata as Record<string, unknown>)?.orderId || reference;
 
-    if (orderId) {
+    if (orderId && typeof orderId === 'string') {
       await updateOrderPaymentStatus(orderId, 'failed', 'cancelled');
       console.log(`Order ${orderId} marked as failed via webhook`);
     }
@@ -120,7 +120,7 @@ async function handleFailedPayment(data: any) {
   }
 }
 
-async function handleTransferSuccess(data: any) {
+async function handleTransferSuccess(data: Record<string, unknown>) {
   try {
     console.log('Transfer successful:', data.reference);
     // Handle successful transfers to merchants (split payments)
@@ -129,7 +129,7 @@ async function handleTransferSuccess(data: any) {
   }
 }
 
-async function handleTransferFailed(data: any) {
+async function handleTransferFailed(data: Record<string, unknown>) {
   try {
     console.log('Transfer failed:', data.reference);
     // Handle failed transfers to merchants

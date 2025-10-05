@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createSplitCode, getMerchantSubaccount } from '@/utils/paystack-split';
+import { getMerchantSubaccount } from '@/utils/paystack-split';
 
 export async function POST(request: NextRequest) {
   try {

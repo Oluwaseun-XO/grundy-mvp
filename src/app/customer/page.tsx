@@ -14,7 +14,6 @@ import { createOrder, createTransaction, createReceipt, updateOrderPaymentStatus
 import { initializePaystackPayment, generateReference, createVirtualAccount } from '@/utils/paystack';
 import { calculateSplit } from '@/utils/paystack-split';
 import toast from 'react-hot-toast';
-import { v4 as uuidv4 } from 'uuid';
 
 export default function CustomerPage() {
   const { state, clearCart, getItemCount } = useCart();
@@ -34,7 +33,6 @@ export default function CustomerPage() {
 
   const handlePayment = async (paymentMethod: PaymentMethod, customer: Customer) => {
     try {
-      const orderId = uuidv4();
       const reference = generateReference();
 
       // Calculate split payment details
