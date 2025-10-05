@@ -21,16 +21,18 @@ export async function POST(request: NextRequest) {
       throw new Error('Failed to create virtual account');
     }
 
-    await response.json();
+    const data = await response.json();
 
-    // For demo purposes, we'll create a mock virtual account
-    // In production, you would use the actual Paystack response
+    // Use actual Paystack test mode response
     const virtualAccount = {
-      accountNumber: `${Math.floor(Math.random() * 9000000000) + 1000000000}`,
-      bankName: 'Test Bank',
-      accountName: `GRUNDY/${orderId.toUpperCase()}`,
-      reference: orderId,
-      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours from now
+      accountNumber: data.data.account_number,
+      bankName: data.data.bank.name,
+      accountName: data.data.account_name,
+      reference: data.data.account_reference,
+      customerId: data.data.customer.id,
+      currency: data.data.currency,
+      active: data.data.active,
+      createdAt: data.data.created_at,
     };
 
     return NextResponse.json({

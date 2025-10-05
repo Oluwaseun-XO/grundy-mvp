@@ -48,7 +48,10 @@ export interface VirtualAccount {
   bankName: string;
   accountName: string;
   reference: string;
-  expiresAt: Date;
+  customerId: string;
+  currency: string;
+  active: boolean;
+  createdAt: string;
 }
 
 export interface Transaction {

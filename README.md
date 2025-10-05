@@ -195,10 +195,15 @@ npm run type-check   # Run TypeScript checks
 - PIN: `0000`
 - OTP: `123456`
 
-#### 2. Bank Transfer on Delivery
+#### 2. Bank Transfer on Delivery (Paystack Virtual Account)
+- Uses Paystack's actual Dedicated Virtual Account API in test mode
 - Order is placed with "pending" payment status
-- Rider can generate virtual account details
-- Simulate payment confirmation in rider app
+- Virtual account is generated using `test-bank` as preferred bank
+- Account details are real test accounts from Paystack's API response
+- To test transfers, use Paystack's demo bank application at: https://demo.paystack.com/
+- Rider can generate virtual account details when customer chooses this payment method
+- Use the generated account number and bank details to simulate transfer
+- Rider confirms payment manually in the app (simulating webhook confirmation)
 
 #### 3. Terminal on Delivery
 - Order is placed with "pending" payment status
