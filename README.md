@@ -180,7 +180,7 @@ The application will be available at:
 - **Customer App**: http://localhost:3000/customer
 - **Rider App**: http://localhost:3000/rider
 
-## 🔧 Development
+## Development
 
 ### Available Scripts
 
@@ -215,10 +215,6 @@ npm run type-check   # Run TypeScript checks
 - Order is placed with "pending" payment status
 - Rider can simulate POS terminal payment
 - Confirm payment in rider app
-
-## 🚀 Deployment to Vercel
-
-### Step 1: Prepare for Deployment
 
 ```bash
 # Build the project to check for errors
