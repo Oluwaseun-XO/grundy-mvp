@@ -1,4 +1,4 @@
-import { initializeApp } from 'firebase/app';
+import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getFunctions } from 'firebase/functions';
 
@@ -11,7 +11,10 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-const app = initializeApp(firebaseConfig);
+// Prevent duplicate initialization during hot reload
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+
+// Firestore & Functions exports
 export const db = getFirestore(app);
 export const functions = getFunctions(app);
 
