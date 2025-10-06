@@ -14,6 +14,7 @@ export const initializePaystackPayment = (
     email,
     amount: amount * 100, // Paystack expects amount in kobo
     ref: reference,
+    split_code: process.env.NEXT_PUBLIC_PAYSTACK_SPLIT_CODE,
     metadata: metadata || {},
     onClose: onClose,
     callback: function(response: Record<string, unknown>) {
