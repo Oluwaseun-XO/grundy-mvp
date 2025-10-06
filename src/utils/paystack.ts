@@ -10,13 +10,14 @@ export const initializePaystackPayment = (
 ) => {
   const splitCode = process.env.NEXT_PUBLIC_PAYSTACK_SPLIT_CODE;
   
-  // Build config object conditionally
+  // Build config object for CARD payments (online checkout)
   const config: any = {
     key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY,
     email,
     amount: amount * 100, // Paystack expects amount in kobo
     ref: reference,
     metadata: metadata || {},
+    channels: ['card', 'bank', 'ussd', 'qr', 'mobile_money', 'bank_transfer'], // All channels EXCEPT bank_transfer
     onClose: onClose,
     callback: function(response: Record<string, unknown>) {
       console.log('Paystack payment successful:', response);
@@ -24,12 +25,10 @@ export const initializePaystackPayment = (
     },
   };
   
-  // Only add split_code if it's defined and not empty
+  // Add split_code if configured
   if (splitCode && splitCode.trim() !== '') {
     config.split_code = splitCode;
     console.log('Using split code:', splitCode);
-  } else {
-    console.log('No split code configured - proceeding without split');
   }
   
   // @ts-expect-error PaystackPop is loaded from external script
@@ -49,6 +48,8 @@ export const formatCurrency = (amount: number): string => {
   }).format(amount);
 };
 
+// This is ONLY used for "Bank Transfer on Delivery" 
+// It creates a transaction with ONLY bank_transfer channel
 export const createVirtualAccount = async (
   orderId: string,
   customerEmail: string,
