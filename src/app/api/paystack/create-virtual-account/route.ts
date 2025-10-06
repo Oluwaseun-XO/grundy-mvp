@@ -18,6 +18,7 @@ export async function POST(request: NextRequest) {
     }
 
     const paystackSecretKey = process.env.PAYSTACK_SECRET_KEY;
+    const splitCode = process.env.NEXT_PUBLIC_PAYSTACK_SPLIT_CODE;
     
     if (!paystackSecretKey) {
       console.error('PAYSTACK_SECRET_KEY not configured in environment variables');
@@ -43,6 +44,7 @@ export async function POST(request: NextRequest) {
         amount: amount * 100, // Convert to kobo
         currency: 'NGN',
         channels: ['bank_transfer'], // Only show bank transfer option
+        split_code: splitCode, // Add this line
         metadata: {
           orderId,
           paymentMethod: 'transfer_on_delivery',
