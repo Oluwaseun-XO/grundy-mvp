@@ -6,7 +6,7 @@ export const products: Product[] = [
     name: 'Fresh Tomatoes',
     price: 800,
     description: 'Locally grown fresh tomatoes - 1kg',
-    image: 'https://images.unsplash.com/photo-1546470427-e5380e0e4a04?w=400&h=400&fit=crop',
+    image: 'https://media.post.rvohealth.io/wp-content/uploads/2020/09/AN313-Tomatoes-732x549-Thumb-732x549.jpg',
     category: 'Fresh Produce',
     stock: 25,
     merchant: 'Balogun Market',
