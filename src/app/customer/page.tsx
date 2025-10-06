@@ -31,6 +31,8 @@ export default function CustomerPage() {
     return matchesSearch && matchesCategory;
   });
 
+// Replace the handlePayment function in src/app/customer/page.tsx
+
 const handlePayment = async (paymentMethod: PaymentMethod, customer: Customer) => {
   try {
     const reference = generateReference();
@@ -46,7 +48,7 @@ const handlePayment = async (paymentMethod: PaymentMethod, customer: Customer) =
       items: state.items,
       total: state.total,
       paymentMethod,
-      paymentStatus: paymentMethod === 'online' ? 'pending' : 'pending',
+      paymentStatus: 'pending',
       orderStatus: 'pending',
       deliveryAddress: customer.address,
       paystackReference: reference,
@@ -106,50 +108,25 @@ const handlePayment = async (paymentMethod: PaymentMethod, customer: Customer) =
         { orderId } // Pass order ID in metadata for webhook processing
       );
     } else if (paymentMethod === 'bank_transfer') {
-      // Create order first
+      // Bank transfer on delivery - just create order
+      // Rider will generate virtual account when they arrive
       const orderId = await createOrder(orderData);
-      
-      // Bank transfer - create virtual account
-      try {
-        const virtualAccount = await createVirtualAccount(orderId, customer.email, state.total);
-        
-        if (virtualAccount) {
-          // Update order with virtual account details
-          await updateOrderPaymentStatus(orderId, 'pending', 'pending');
 
-          // Store virtual account in the order
-          await updateOrder(orderId, { virtualAccount });
+      // Create transaction record
+      await createTransaction({
+        orderId,
+        amount: state.total,
+        paymentMethod: 'bank_transfer',
+        status: 'pending',
+        reference,
+      });
 
-          // Create transaction record
-          await createTransaction({
-            orderId,
-            amount: state.total,
-            paymentMethod: 'bank_transfer',
-            status: 'pending',
-            reference,
-          });
-
-          toast.success(`Order placed! Transfer ₦${state.total.toLocaleString()} to account ${virtualAccount.accountNumber} (${virtualAccount.bankName})`);
-          clearCart();
-          setShowCheckout(false);
-        } else {
-          throw new Error('Failed to create virtual account');
-        }
-      } catch (error) {
-        console.error('Virtual account error:', error);
-        toast.error('Could not create virtual account. Please try another payment method.');
-        // Still create the order but without virtual account
-        await createTransaction({
-          orderId,
-          amount: state.total,
-          paymentMethod: 'bank_transfer',
-          status: 'pending',
-          reference,
-        });
-        toast.success('Order placed! Payment details will be provided by the rider.');
-        clearCart();
-        setShowCheckout(false);
-      }
+      toast.success(
+        'Order placed successfully! The rider will provide bank transfer details when they arrive.',
+        { duration: 6000 }
+      );
+      clearCart();
+      setShowCheckout(false);
     } else if (paymentMethod === 'terminal') {
       // Terminal payment - just create order
       const finalOrderId = await createOrder(orderData);
@@ -172,7 +149,7 @@ const handlePayment = async (paymentMethod: PaymentMethod, customer: Customer) =
     toast.error('Failed to process order. Please try again.');
   }
 };
-
+  
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
