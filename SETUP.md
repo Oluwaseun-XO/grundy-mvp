@@ -1,4 +1,4 @@
-# 🛠 Local Development Setup Guide
+# Local Development Setup Guide
 
 This guide will help you set up the Grundy MVP for local development on your machine.
 
@@ -10,7 +10,7 @@ Make sure you have these installed:
 - **Git** - [Download here](https://git-scm.com/)
 - **Code Editor** (VS Code recommended) - [Download here](https://code.visualstudio.com/)
 
-## 🚀 Step 1: Clone the Repository
+## Step 1: Clone the Repository
 
 ```bash
 # Clone the repository
@@ -23,7 +23,7 @@ cd grundy-mvp
 npm install
 ```
 
-## 🔧 Step 2: Firebase Setup
+## Step 2: Firebase Setup
 
 ### 2.1 Create Firebase Project
 1. Go to [Firebase Console](https://console.firebase.google.com/)
@@ -83,7 +83,7 @@ Use these test cards for testing payments:
 - **PIN**: `0000`
 - **OTP**: `123456`
 
-## 🔐 Step 4: Environment Variables
+## Step 4: Environment Variables
 
 ### 4.1 Create Environment File
 In the project root, create a file named `.env.local`:
@@ -240,26 +240,5 @@ npm run type-check
 3. **Verify environment variables**: Make sure all required variables are set
 4. **Check Firebase**: Verify data is being written to Firestore
 5. **Test Paystack**: Use the test cards provided above
-
-## 🎯 Next Steps
-
-Once you have the app running locally:
-
-1. **Customize Products**: Edit `src/data/products.ts` to add your own products
-2. **Modify Styling**: Update TailwindCSS classes to match your brand
-3. **Add Features**: Implement additional functionality as needed
-4. **Deploy**: Follow the deployment guide to deploy to Vercel
-
-## 📞 Support
-
-If you encounter issues:
-1. Check this troubleshooting section
-2. Review the error messages carefully
-3. Ensure all environment variables are correctly set
-4. Verify Firebase and Paystack configurations
-
----
-
-**Happy coding!** 🚀
 
 Your local development server will be available at: http://localhost:3000
