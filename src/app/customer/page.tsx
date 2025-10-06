@@ -176,37 +176,44 @@ const handlePayment = async (paymentMethod: PaymentMethod, customer: Customer) =
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Link href="/">
-                <Button variant="secondary" size="sm">
-                  <ArrowLeft size={16} className="mr-2" />
-                  Back to Home
-                </Button>
-              </Link>
-              <h1 className="text-2xl font-bold text-gray-900">Grundy Store</h1>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              <Button
-                onClick={() => setShowCart(!showCart)}
-                variant="secondary"
-                className="relative"
-              >
-                <ShoppingCart size={20} />
-                {getItemCount() > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    {getItemCount()}
-                  </span>
-                )}
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
 
+<header className="bg-white shadow-sm border-b">
+  <div className="container mx-auto px-4 py-4">
+    <div className="flex items-center justify-between">
+      <div className="flex items-center space-x-4">
+        <Link href="/">
+          <Button variant="secondary" size="sm">
+            <ArrowLeft size={16} className="mr-2" />
+            Back to Home
+          </Button>
+        </Link>
+        <h1 className="text-2xl font-bold text-gray-900">Grundy Store</h1>
+      </div>
+      
+      <div className="flex items-center space-x-4">
+        <Link href="/customer/orders">
+          <Button variant="secondary" size="sm">
+            <Package size={16} className="mr-2" />
+            My Orders
+          </Button>
+        </Link>
+        <Button
+          onClick={() => setShowCart(!showCart)}
+          variant="secondary"
+          className="relative"
+        >
+          <ShoppingCart size={20} />
+          {getItemCount() > 0 && (
+            <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+              {getItemCount()}
+            </span>
+          )}
+        </Button>
+      </div>
+    </div>
+  </div>
+</header>
+      
       <div className="container mx-auto px-4 py-8">
         <div className="grid lg:grid-cols-4 gap-8">
           {/* Sidebar */}
