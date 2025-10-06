@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Search, ShoppingCart, Filter, ArrowLeft } from 'lucide-react';
+import { Search, ShoppingCart, Filter, ArrowLeft, Package } from 'lucide-react';
 import Link from 'next/link';
 import { products } from '@/data/products';
 import { ProductCard } from '@/components/customer/ProductCard';
