@@ -8,7 +8,8 @@ import { Card, CardContent, CardHeader } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { formatCurrency } from '@/utils/paystack';
 import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
-import { db } from '@/utils/firebase';
+import { db } from '@/lib/firebase';
+
 
 export default function CustomerOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
