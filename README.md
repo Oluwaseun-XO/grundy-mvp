@@ -1,13 +1,12 @@
 # Grundy MVP - Marketplace Platform
 
-A comprehensive marketplace MVP that connects open-air markets and grocery shops to customers, built with Next.js, Firebase, and Paystack integration featuring customer app, rider app, and multiple payment methods with automatic revenue splitting.
+A marketplace MVP that connects open-air markets and grocery shops to customers, built with Next.js, Firebase, and Paystack integration featuring customer app, rider app, and multiple payment methods with automatic revenue splitting.
 
-## 📚 Quick Links
+## Quick Links
 
-- **[🛠 Local Development Setup](./SETUP.md)** - Complete guide for setting up the project locally
-- **[🚀 Deployment Guide](./DEPLOYMENT.md)** - Step-by-step Vercel deployment instructions
-- **[🔐 Paystack Integration](./PAYSTACK_SETUP.md)** - Webhook setup and payment configuration
-- **[💡 Live Demo](#)** - Coming soon after deployment
+- **[Local Development Setup](./SETUP.md)** - Complete guide for setting up the project locally
+- **[Deployment Guide](./DEPLOYMENT.md)** - Step-by-step Vercel deployment instructions
+- **[Paystack Integration](./PAYSTACK_SETUP.md)** - Webhook setup and payment configuration
 
 ## 🚀 Features
 
@@ -18,11 +17,11 @@ A comprehensive marketplace MVP that connects open-air markets and grocery shops
   - **Online Checkout**: Instant payment with Paystack
   - **Bank Transfer on Delivery**: Virtual account generation via Paystack API
   - **Terminal on Delivery**: POS terminal simulation
-- **Order Tracking**: Real-time order status updates
+- **Order Tracking**: Real time order status updates
 - **Receipt Generation**: Automatic email receipts for all orders
 
 ### Rider App
-- **Order Management**: View all customer orders in real-time
+- **Order Management**: View all customer orders in real time
 - **Order Status Updates**: Track orders from pending to delivered
 - **Payment Processing**: 
   - Generate virtual accounts for bank transfers
@@ -32,11 +31,10 @@ A comprehensive marketplace MVP that connects open-air markets and grocery shops
 
 ### Payment Integration & Revenue Model
 - **Paystack Integration**: Full test mode integration with public/secret keys
-- **Split Payments**: Automatic 10% platform fee split (90% to merchants, 10% to Grundy)
+- **Split Payments**: Automatic 10% platform fee split (90% to merchants, 10% to Grundy) using paystack payment split
 - **Virtual Accounts**: Dynamic generation for bank transfer orders
 - **Transaction Tracking**: Complete audit trail for all payments
-- **Receipt System**: Automated receipt generation and email delivery
-- **Merchant Support**: Multi-merchant order handling with individual subaccounts
+- **Merchant Support**: Multi merchant order handling with individual subaccounts
 
 ## 🛠 Tech Stack
 
@@ -47,7 +45,7 @@ A comprehensive marketplace MVP that connects open-air markets and grocery shops
 - **Icons**: Lucide React
 - **Notifications**: React Hot Toast
 
-## 📦 Project Structure
+## Project Structure
 
 ```
 grundy-mvp/
@@ -78,7 +76,7 @@ grundy-mvp/
 └── package.json                   # Dependencies and scripts
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -205,14 +203,14 @@ npm run type-check   # Run TypeScript checks
 - OTP: `123456`
 
 #### 2. Bank Transfer on Delivery (Paystack Virtual Account)
-- Uses Paystack's actual Dedicated Virtual Account API in test mode
+- Uses Paystack's transfer method API in test mode
 - Order is placed with "pending" payment status
 - Virtual account is generated using `test-bank` as preferred bank
 - Account details are real test accounts from Paystack's API response
-- To test transfers, use Paystack's demo bank application at: https://demo.paystack.com/
+- To test transfers, use Paystack's demo bank application at: https://demobank.paystackintegrations.com/
 - Rider can generate virtual account details when customer chooses this payment method
 - Use the generated account number and bank details to simulate transfer
-- Rider confirms payment manually in the app (simulating webhook confirmation)
+- Payment is automatically confirmed (webhook confirmation)
 
 #### 3. Terminal on Delivery
 - Order is placed with "pending" payment status
@@ -227,56 +225,7 @@ npm run type-check   # Run TypeScript checks
 # Build the project to check for errors
 npm run build
 ```
-
-### Step 2: Deploy to Vercel
-
-#### Option A: Vercel CLI (Recommended)
-```bash
-# Install Vercel CLI
-npm i -g vercel
-
-# Login to Vercel
-vercel login
-
-# Deploy
-vercel
-
-# Follow the prompts:
-# - Link to existing project? No
-# - Project name: grundy-mvp
-# - Directory: ./
-# - Override settings? No
-```
-
-#### Option B: GitHub Integration
-1. Push your code to GitHub
-2. Go to [Vercel Dashboard](https://vercel.com/dashboard)
-3. Click "New Project"
-4. Import your GitHub repository
-5. Configure environment variables
-6. Deploy
-
-### Step 3: Configure Environment Variables in Vercel
-
-1. Go to your project in Vercel Dashboard
-2. Click "Settings" > "Environment Variables"
-3. Add all variables from your `.env.local`:
-   - `NEXT_PUBLIC_FIREBASE_API_KEY`
-   - `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
-   - `NEXT_PUBLIC_FIREBASE_PROJECT_ID`
-   - `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`
-   - `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`
-   - `NEXT_PUBLIC_FIREBASE_APP_ID`
-   - `NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY`
-   - `PAYSTACK_SECRET_KEY`
-
-### Step 4: Redeploy
-After adding environment variables, trigger a new deployment:
-```bash
-vercel --prod
-```
-
-## 📱 Usage Guide
+## Usage Guide
 
 ### For Customers
 1. Visit the customer app
@@ -287,7 +236,7 @@ vercel --prod
    - **Online**: Pay immediately with Paystack
    - **Bank Transfer**: Pay when rider arrives with virtual account
    - **Terminal**: Pay when rider arrives with POS terminal
-6. Track order status in real-time
+6. Track order status in real time
 
 ### For Riders
 1. Visit the rider app
@@ -308,76 +257,6 @@ vercel --prod
 - `orders` - Customer orders with payment and delivery info
 - `transactions` - Payment transaction records
 - `receipts` - Generated receipts for orders
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-#### 1. Firebase Connection Error
-- Check if Firebase config is correct in `.env.local`
-- Ensure Firestore is enabled in Firebase Console
-- Verify Firestore rules allow read/write access
-
-#### 2. Paystack Payment Fails
-- Confirm you're using test keys (start with `pk_test_` and `sk_test_`)
-- Check if test card details are correct
-- Ensure Paystack account is verified
-
-#### 3. Images Not Loading
-- Check if Unsplash domain is allowed in `next.config.ts`
-- Verify internet connection for external images
-
-#### 4. Build Errors
-```bash
-# Clear Next.js cache
-rm -rf .next
-
-# Reinstall dependencies
-rm -rf node_modules package-lock.json
-npm install
-
-# Try building again
-npm run build
-```
-
-### Development Tips
-
-1. **Hot Reload**: The app supports hot reload for instant development feedback
-2. **TypeScript**: All components are fully typed for better development experience
-3. **Responsive Design**: The app works on desktop, tablet, and mobile devices
-4. **Error Handling**: Comprehensive error handling with user-friendly messages
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Commit changes: `git commit -m 'Add amazing feature'`
-4. Push to branch: `git push origin feature/amazing-feature`
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- [Next.js](https://nextjs.org/) - React framework
-- [Firebase](https://firebase.google.com/) - Backend services
-- [Paystack](https://paystack.com/) - Payment processing
-- [TailwindCSS](https://tailwindcss.com/) - Styling
-- [Lucide React](https://lucide.dev/) - Icons
-- [Vercel](https://vercel.com/) - Deployment platform
-
-## 📞 Support
-
-If you encounter any issues or have questions:
-
-1. Check the troubleshooting section above
-2. Review the [Next.js documentation](https://nextjs.org/docs)
-3. Check [Firebase documentation](https://firebase.google.com/docs)
-4. Review [Paystack documentation](https://paystack.com/docs)
-5. Open an issue on GitHub
-
 ---
 
-**Happy coding! 🚀**
+**OKE OLUWASEUN ASSESSMENT**
