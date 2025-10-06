@@ -10,7 +10,6 @@ import { formatCurrency } from '@/utils/paystack';
 import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
-
 export default function CustomerOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -156,7 +155,7 @@ export default function CustomerOrdersPage() {
                 <CardContent className="p-12 text-center">
                   <Package size={48} className="mx-auto text-gray-400 mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 mb-2">No orders found</h3>
-                  <p className="text-gray-600">You haven't placed any orders yet.</p>
+                  <p className="text-gray-600">You haven&apos;t placed any orders yet.</p>
                   <Link href="/customer">
                     <Button className="mt-4">Start Shopping</Button>
                   </Link>
