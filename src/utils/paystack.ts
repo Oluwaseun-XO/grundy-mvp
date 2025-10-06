@@ -8,21 +8,32 @@ export const initializePaystackPayment = (
   onClose: () => void,
   metadata?: Record<string, unknown>
 ) => {
-  // @ts-expect-error PaystackPop is loaded from external script
- const handler = PaystackPop.setup({
+  const splitCode = process.env.NEXT_PUBLIC_PAYSTACK_SPLIT_CODE;
+  
+  // Build config object conditionally
+  const config: any = {
     key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY,
     email,
     amount: amount * 100, // Paystack expects amount in kobo
     ref: reference,
-    split_code: process.env.NEXT_PUBLIC_PAYSTACK_SPLIT_CODE,
     metadata: metadata || {},
     onClose: onClose,
     callback: function(response: Record<string, unknown>) {
-      // This callback receives the response from Paystack
       console.log('Paystack payment successful:', response);
       onSuccess(response);
     },
-  });
+  };
+  
+  // Only add split_code if it's defined and not empty
+  if (splitCode && splitCode.trim() !== '') {
+    config.split_code = splitCode;
+    console.log('Using split code:', splitCode);
+  } else {
+    console.log('No split code configured - proceeding without split');
+  }
+  
+  // @ts-expect-error PaystackPop is loaded from external script
+  const handler = PaystackPop.setup(config);
   
   handler.openIframe();
 };
