@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { MapPin, Phone, Mail, CreditCard, Building, Smartphone, CheckCircle } from 'lucide-react';
+import { MapPin, Phone, Mail, CreditCard, Building, Smartphone, CheckCircle, X } from 'lucide-react';
 import { Order, PaymentMethod } from '@/types';
 import { Card, CardContent, CardHeader } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -18,6 +18,8 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, onOrderUpdate }) =>
   const [loading, setLoading] = useState(false);
   const [showVirtualAccount, setShowVirtualAccount] = useState(false);
   const [showTerminal, setShowTerminal] = useState(false);
+  const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
+  const [paymentReference, setPaymentReference] = useState<string | null>(null);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -69,6 +71,8 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, onOrderUpdate }) =>
         orderStatus: 'confirmed'
       });
       toast.success('Payment confirmed!');
+      setShowVirtualAccount(false);
+      setPaymentUrl(null);
       onOrderUpdate();
     } catch {
       toast.error('Failed to confirm payment');
@@ -78,11 +82,52 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, onOrderUpdate }) =>
   };
 
   const handleRequestPayment = async () => {
-    if (order.paymentMethod === 'bank_transfer') {
-      setShowVirtualAccount(true);
-    } else if (order.paymentMethod === 'terminal') {
+    if (order.paymentMethod === 'terminal') {
       setShowTerminal(true);
+      return;
     }
+
+    if (order.paymentMethod === 'bank_transfer') {
+      setLoading(true);
+      try {
+        const response = await fetch('/api/paystack/create-virtual-account', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderId: order.id,
+            customerEmail: order.customer.email,
+            amount: order.total,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          setPaymentUrl(data.authorizationUrl);
+          setPaymentReference(data.reference);
+          setShowVirtualAccount(true);
+          toast.success('Payment link generated!');
+        } else {
+          toast.error(data.error || 'Failed to generate payment link');
+        }
+      } catch (error) {
+        toast.error('Network error. Please try again.');
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success('Copied to clipboard!');
+  };
+
+  const handleClosePaymentModal = () => {
+    setShowVirtualAccount(false);
+    setPaymentUrl(null);
+    // Payment will be automatically confirmed via webhook
   };
 
   return (
@@ -165,6 +210,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, onOrderUpdate }) =>
               <Button
                 size="sm"
                 onClick={handleRequestPayment}
+                loading={loading}
                 className="ml-2"
               >
                 Request Payment
@@ -217,33 +263,62 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, onOrderUpdate }) =>
           )}
         </div>
 
-        {/* Virtual Account Modal */}
-        {showVirtualAccount && order.virtualAccount && (
-          <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-            <h4 className="font-medium mb-2 text-green-800">Virtual Account Details</h4>
-            <div className="space-y-1 text-sm">
-              <div><strong>Account Number:</strong> {order.virtualAccount.accountNumber}</div>
-              <div><strong>Bank:</strong> {order.virtualAccount.bankName}</div>
-              <div><strong>Account Name:</strong> {order.virtualAccount.accountName}</div>
-              <div><strong>Amount:</strong> {formatCurrency(order.total)}</div>
-            </div>
-            <div className="flex space-x-2 mt-3">
-              <Button
-                size="sm"
-                variant="success"
-                onClick={handlePaymentConfirmation}
-                loading={loading}
-              >
-                <CheckCircle size={16} className="mr-1" />
-                Confirm Payment Received
-              </Button>
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={() => setShowVirtualAccount(false)}
-              >
-                Close
-              </Button>
+        {/* Payment Modal - Full Screen */}
+        {showVirtualAccount && paymentUrl && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg w-full max-w-4xl h-[90vh] flex flex-col">
+              <div className="p-4 border-b flex justify-between items-center">
+                <div>
+                  <h3 className="text-lg font-semibold">Show this to Customer</h3>
+                  <p className="text-sm text-gray-600">
+                    Order #{order.id.slice(-8)} - {formatCurrency(order.total)}
+                  </p>
+                </div>
+                <button
+                  onClick={handleClosePaymentModal}
+                  className="text-gray-500 hover:text-gray-700 text-2xl font-bold"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+              
+              <div className="flex-1 overflow-hidden">
+                <iframe
+                  src={paymentUrl}
+                  className="w-full h-full border-0"
+                  title="Payment Details"
+                />
+              </div>
+
+              <div className="p-4 border-t bg-gray-50">
+                <div className="flex gap-2 mb-3">
+                  <Button
+                    size="sm"
+                    onClick={() => copyToClipboard(paymentUrl)}
+                    className="flex-1"
+                  >
+                    Copy Payment Link
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => window.open(paymentUrl, '_blank')}
+                    className="flex-1"
+                  >
+                    Open in New Tab
+                  </Button>
+                </div>
+                <Button
+                  onClick={handleClosePaymentModal}
+                  variant="success"
+                  className="w-full"
+                >
+                  Done - Customer Has Seen Details
+                </Button>
+                <p className="text-xs text-gray-500 text-center mt-2">
+                  Payment will be automatically confirmed when customer transfers
+                </p>
+              </div>
             </div>
           </div>
         )}
